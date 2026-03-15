@@ -1,0 +1,16 @@
+{
+	"api": {
+	  "baseUrl": "http://localhost:3000",
+	  "timeout": 5000,
+	  "endpoints": {
+		"serverState": "/api/server-state",
+		"products": "/api/products",
+		"stats": "/api/stats/:section",
+		"wins": "/api/wins"
+	  }
+	},
+	"mockSettings": {
+	  "enableLatency": true,
+	  "latencyRange": [100, 500]
+	}
+  }

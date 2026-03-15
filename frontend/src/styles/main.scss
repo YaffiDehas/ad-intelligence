@@ -1,0 +1,29 @@
+// ============================================================
+// main.scss — Single entry point
+//
+// Load order matters:
+//   1. _variables.scss  → overrides Bootstrap defaults + defines
+//                         custom SCSS vars used in feature files
+//   2. Bootstrap source → picks up the overridden variables
+//   3. _base.scss       → CSS custom properties, reset, animations
+//   4. Feature partials → one file per feature, in any order
+// ============================================================
+
+// 1. Design tokens + Bootstrap variable overrides
+//    Must come BEFORE Bootstrap so $primary, $border-radius etc. are overridden
+@import 'variables';
+
+// 2. Bootstrap full library (Vite tree-shakes unused JS at build time)
+@import 'bootstrap/scss/bootstrap';
+
+// 3. Global base: CSS vars, reset, animations, shared utilities
+@import 'base';
+
+// 4. Feature-level styles — each feature owns its own partial
+@import '../features/layout/layout';
+@import '../features/header/header';
+@import '../features/sidebar/sidebar';
+@import '../features/dashboard/dashboard';
+@import '../features/ad-card/ad-card';
+@import '../features/quick-wins/quick-wins';
+@import '../features/mobile-nav/mobile-nav';

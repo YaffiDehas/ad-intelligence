@@ -1,0 +1,98 @@
+// ============================================================
+// features/components/_mobile-nav.scss
+// Fixed bottom navigation bar — mobile only
+// ============================================================
+
+.mobile-nav {
+  display: none; // Hidden on desktop
+
+  @media (max-width: 768px) {
+    display: block;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--bg-surface);
+    border-top: 1px solid var(--border);
+    z-index: 200;
+    padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+  }
+
+  &__scroll {
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+    padding: 0 8px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+
+    // On tablet — items fill the full width evenly
+    @media (min-width: 480px) and (max-width: 768px) {
+      overflow-x: visible;
+      justify-content: stretch;
+    }
+
+    // On small phones — allow horizontal scroll
+    @media (max-width: 479px) {
+      overflow-x: auto;
+    }
+
+    &::-webkit-scrollbar { display: none; }
+  }
+
+  &__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 6px 8px;
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+    background: none;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    font-family: var(--font-display);
+
+    // Fill available space evenly on tablet
+    @media (min-width: 480px) and (max-width: 768px) {
+      flex: 1;
+      flex-shrink: 0;
+    }
+
+    // Fixed width on small phones
+    @media (max-width: 479px) {
+      flex-shrink: 0;
+      min-width: 64px;
+    }
+
+    &--active {
+      background: var(--accent-glow);
+      border-color: var(--border-accent);
+
+      .mobile-nav__label { color: var(--accent); }
+    }
+  }
+
+  &__icon { font-size: 18px; }
+
+  &__label {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    white-space: nowrap;
+  }
+
+  &__skeleton {
+    flex: 1;
+    height: 48px;
+    border-radius: var(--radius-sm);
+    background: var(--bg-elevated);
+    animation: pulse 1.5s infinite;
+
+    @media (max-width: 479px) {
+      flex: none;
+      width: 60px;
+    }
+  }
+}

@@ -1,0 +1,32 @@
+services:
+  backend:
+    build: ./backend
+    container_name: ad-intelligence-backend
+    restart: unless-stopped
+    networks:
+      - app-network
+    develop:
+      watch:
+        - action: rebuild
+          path: ./backend/backend.js
+
+  frontend:
+    build: ./frontend
+    container_name: ad-intelligence-frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - app-network
+    develop:
+      watch:
+        - action: rebuild
+          path: ./frontend/src
+        - action: rebuild
+          path: ./frontend/public
+
+networks:
+  app-network:
+    driver: bridge

@@ -1,0 +1,73 @@
+// ============================================================
+// _variables.scss
+// Bootstrap variable overrides + custom design tokens
+// Must be imported BEFORE Bootstrap so overrides take effect
+//
+// Color philosophy:
+// High contrast dark theme — rich navy/slate backgrounds with
+// crisp white text and vivid accent colors. Every text level
+// is legible against its background.
+// ============================================================
+
+// --- Override Bootstrap's color system ---
+$primary:          #60a5fa;
+$secondary:        #a78bfa;
+$success:          #4ade80;
+$danger:           #f87171;
+$warning:          #fbbf24;
+$info:             #38bdf8;
+$light:            #1e2030;
+$dark:             #080b14;
+$body-bg:          #080b14;
+$body-color:       #f0f4ff;
+
+// --- Typography ---
+$font-family-sans-serif: 'Inter', system-ui, sans-serif;
+$font-family-monospace:  'JetBrains Mono', monospace;
+$font-size-base:         1rem;
+$line-height-base:       1.6;
+$headings-font-weight:   700;
+
+// --- Border radius ---
+$border-radius:    6px;
+$border-radius-lg: 12px;
+$border-radius-xl: 18px;
+
+// --- Shadows ---
+$box-shadow-sm: 0 1px 4px rgba(0,0,0,0.6);
+$box-shadow:    0 4px 24px rgba(0,0,0,0.5);
+$box-shadow-lg: 0 8px 48px rgba(0,0,0,0.7);
+
+// --- Background scale — rich navy/slate ---
+$bg-base:       #080b14;   // deepest — page background
+$bg-surface:    #0f1221;   // cards, sidebar, header
+$bg-elevated:   #171b2e;   // inputs, badges, skeleton
+$bg-hover:      #1e2340;   // hover states
+
+// --- Borders ---
+$border-default: rgba(148, 163, 184, 0.12);
+$border-accent:  rgba(96, 165, 250, 0.4);
+
+// --- Text scale — high contrast ---
+$text-primary:   #f0f4ff;   // near white — titles, values
+$text-secondary: #cbd5e1;   // light grey — labels, meta
+$text-muted:     #94a3b8;   // medium grey — hints, placeholders
+
+// --- Accent colors — vivid ---
+$accent:         #60a5fa;
+$accent-glow:    rgba(96, 165, 250, 0.12);
+$accent-2:       #a78bfa;
+$accent-3:       #4ade80;
+$accent-neg:     #f87171;
+
+// --- KPI accent bars ---
+$kpi-1:          #60a5fa;
+$kpi-2:          #a78bfa;
+$kpi-3:          #4ade80;
+$kpi-4:          #fbbf24;
+
+$sidebar-w:      240px;
+$header-h:       64px;
+
+$font-display: 'JetBrains Mono', monospace;
+$font-mono:      'JetBrains Mono', monospace;

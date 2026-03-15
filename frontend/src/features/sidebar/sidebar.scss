@@ -1,0 +1,90 @@
+// ============================================================
+// features/sidebar/_sidebar.scss
+// Left navigation sidebar
+// ============================================================
+
+.sidebar {
+  grid-column: 1;
+  grid-row: 2;
+  background: var(--bg-surface);
+  border-right: 1px solid var(--border);
+  padding: 20px 12px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  &__label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    padding: 8px 12px 4px;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    border: 1px solid transparent;
+    background: none;
+    width: 100%;
+    text-align: left;
+    font-family: var(--font-display);
+
+    &:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+    }
+
+    &--active {
+      background: var(--accent-glow);
+      color: var(--accent);
+      border-color: var(--border-accent);
+
+      .sidebar__item-icon { background: var(--accent-glow); }
+      .sidebar__item-name--label { color: var(--accent); }
+    }
+  }
+
+  &__item-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    background: var(--bg-elevated);
+    flex-shrink: 0;
+    transition: background 0.15s ease;
+  }
+
+  &__item-name {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__skeleton {
+    height: 40px;
+    border-radius: var(--radius-sm);
+    background: var(--bg-elevated);
+    animation: pulse 1.5s infinite;
+    margin: 2px 0;
+  }
+
+  // Hidden on mobile — replaced by mobile nav
+  @media (max-width: 768px) {
+    display: none;
+  }
+}
