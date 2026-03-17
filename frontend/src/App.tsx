@@ -10,10 +10,10 @@
 import { useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useAppStore } from './store/useAppStore';
-import { Header } from './features/header/Header';
-import { Sidebar } from './features/sidebar/Sidebar';
-import { MobileNav } from './features/mobile-nav/MobileNav';
-import { Dashboard } from './features/dashboard/Dashboard';
+import { Header } from './features/header/header';
+import { Sidebar } from './features/sidebar/sidebar';
+import { MobileNav } from './features/mobile-nav/mobile-nav';
+import { Dashboard } from './features/dashboard/dashboard';
 
 const queryClient = new QueryClient({
   defaultOptions: {

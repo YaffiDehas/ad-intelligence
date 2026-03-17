@@ -6,7 +6,7 @@
 
 import type { Ad } from '../../types/api';
 import { normalizeImageUrl } from '../../api/endpoints';
-import { AdCardImage } from './AdCardImage';
+import { AdCardImage } from './ad-card-image';
 
 interface AdCardProps {
   ad: Ad;

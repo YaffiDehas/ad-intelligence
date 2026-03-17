@@ -16,11 +16,11 @@
 import { lazy, Suspense } from 'react';
 import { useAppStore } from '../../store/useAppStore';
 import { useStats } from '../../hooks/useDataFetching';
-import { KPICard } from '../kpi-card/KPICard';
+import { KPICard } from '../kpi-card/kpi-card';
 import type { StatSection } from '../../types/api';
 
 const QuickWins = lazy(() =>
-  import('../quick-wins/QuickWins').then((m) => ({ default: m.QuickWins }))
+  import('../quick-wins/quick-wins').then((m) => ({ default: m.QuickWins }))
 );
 
 // Single source of truth for KPI sections.

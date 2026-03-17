@@ -16,7 +16,7 @@ import { useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useWins } from '../../hooks/useDataFetching';
 import { useAppStore } from '../../store/useAppStore';
-import { AdCard } from '../ad-card/AdCard';
+import { AdCard } from '../ad-card/ad-card';
 
 export function QuickWins() {
   // Granular selectors — re-renders only when filters change
