@@ -1,150 +1,185 @@
 # Ad Intelligence Dashboard
 
-A professional React SPA built as part of a Senior Frontend Engineer technical assessment. The dashboard visualizes Nike ad campaign data from a provided backend emulator.
+A professional React SPA built as part of a Senior Frontend Engineer technical assessment. The dashboard visualizes Nike ad campaign data from a provided backend emulator, demonstrating production-grade architecture, performance patterns, and deliberate engineering decisions.
 
 ---
 
 ## Quick Start
 
-### With Docker (recommended)
+### Docker (recommended)
 ```bash
 docker-compose up --build
 ```
-Frontend available at `http://localhost:8080`
+Frontend → `http://localhost:8080`
 
 ### Local Development (hot reload)
 ```bash
 # Terminal 1 — Backend
-cd backend
-npm install
-node backend.js
+cd backend && npm install && node backend.js
 
 # Terminal 2 — Frontend
-cd frontend
-npm install
-npm run dev
+cd frontend && npm install && npm run dev
 ```
-Frontend available at `http://localhost:5173`
+Frontend → `http://localhost:5173`
+
+> No environment changes needed between Docker and local dev — `client.ts` detects the runtime environment automatically. See [Docker & API Routing](#docker--api-routing).
 
 ---
 
 ## Project Structure
 
 ```
-src/
-├── api/
-│   ├── client.ts          # Base HTTP client, config loader, env detection
-│   └── endpoints.ts       # Typed endpoint functions + normalizeImageUrl
-├── features/
-│   ├── ad-card/
-│   │   ├── AdCard.tsx     # Ad card layout — delegates image to AdCardImage
-│   │   ├── AdCardImage.tsx# Image state machine (loading → loaded | error)
-│   │   └── ad-card.scss
-│   ├── dashboard/
-│   │   ├── Dashboard.tsx  # KPI grid + lazy QuickWins
-│   │   └── dashboard.scss
-│   ├── header/
-│   │   ├── Header.tsx     # Date range, server status, theme toggle
-│   │   └── header.scss
-│   ├── KPICard/
-│   │   └── KPICard.tsx    # Individual KPI metric card
-│   ├── layout/
-│   │   └── layout.scss
-│   ├── mobile-nav/
-│   │   ├── MobileNav.tsx  # Fixed bottom nav — mobile only
-│   │   └── mobile-nav.scss
-│   ├── quick-wins/
-│   │   ├── QuickWins.tsx  # Infinite scroll ad grid
-│   │   └── quick-wins.scss
-│   └── sidebar/
-│       ├── Sidebar.tsx    # Product navigation — desktop only
-│       └── sidebar.scss
-├── hooks/
-│   └── useDataFetching.ts # All TanStack Query hooks
-├── store/
-│   └── useAppStore.ts     # Zustand global state
-├── styles/
-│   ├── main.scss          # Entry point — import order matters
-│   ├── variables.scss     # Bootstrap overrides + design tokens
-│   └── base.scss          # CSS custom properties, reset, animations
-└── types/
-    └── api.ts             # All API contracts and data models
+frontend/
+├── src/
+│   ├── api/
+│   │   ├── client.ts               # HTTP client, Promise singleton config loader, env detection
+│   │   └── endpoints.ts            # Typed endpoint functions + normalizeImageUrl utility
+│   ├── features/
+│   │   ├── ad-card/
+│   │   │   ├── ad-card-image.tsx   # Self-contained image state machine (loading → loaded | error)
+│   │   │   ├── ad-card.scss
+│   │   │   └── ad-card.tsx         # Ad card layout — delegates image concerns to AdCardImage
+│   │   ├── dashboard/
+│   │   │   ├── dashboard.tsx       # KPI grid + lazy-loaded QuickWins
+│   │   │   └── dashboard.scss
+│   │   ├── header/
+│   │   │   ├── header.tsx          # Date range picker, Last Updated badge, theme toggle
+│   │   │   └── header.scss
+│   │   ├── kpi-card/
+│   │   │   └── kpi-card.tsx        # Individual KPI metric card with skeleton state
+│   │   ├── layout/
+│   │   │   └── layout.scss         # App shell grid layout + responsive breakpoints
+│   │   ├── mobile-nav/
+│   │   │   ├── mobile-nav.scss
+│   │   │   └── mobile-nav.tsx       # Fixed bottom navigation — mobile only (≤768px)
+│   │   ├── quick-wins/
+│   │   │   ├── quick-wins.scss
+│   │   │   └── quick-wins.tsx      # Infinite scroll ad grid with sentinel observer
+│   │   └── sidebar/
+│   │       ├── sidebar.tsx         # Product navigation — desktop only (>768px)
+│   │       └── sidebar.scss
+│   ├── hooks/
+│   │   └── useDataFetching.ts      # All TanStack Query hooks — one per endpoint
+│   ├── store/
+│   │   └── useAppStore.ts          # Zustand store — UI state only, persisted to localStorage
+│   ├── styles/
+│   │   ├── base.scss               # CSS custom properties, reset, keyframes, shared utilities
+│   │   ├── main.scss               # Single entry point — import order is load-order critical
+│   │   └── variables.scss          # Bootstrap overrides + SCSS design tokens
+│   └── types/
+│       └── api.ts                  # Canonical API contracts and data models
+├── nginx.conf                      # nginx SPA routing + /api/* proxy to backend
+├── Dockerfile                      # Multi-stage build: Vite builder → nginx runner
+├── index.html
+├── package.json
+└── vite.config.ts
 ```
 
 ---
 
 ## Design Rationale
 
-The layout uses a fixed sidebar for product navigation with a scrollable main content area. This keeps navigation always visible on desktop — important for a power-user dashboard where product switching is a primary action.
+### Layout
+A fixed sidebar drives product navigation with a scrollable main content area. Product switching is the primary action on this dashboard — keeping navigation permanently visible eliminates an interaction step on every context change.
 
-Visual hierarchy places KPI metrics at the top (glanceable numbers) followed by the Ad Discovery section below (exploratory content). This matches the natural usage pattern: check high-level health metrics first, then explore specific creatives.
+### Visual Hierarchy
+KPI metrics sit above the ad discovery grid. Users arrive to check high-level campaign health first, then drill into creatives. The layout mirrors this natural workflow.
 
-Dark mode is the default theme, appropriate for an analytics tool used for extended periods. Light mode is available and persists across sessions via Zustand's `persist` middleware.
+### Theming
+Dark mode is the default — analytics tools are used for extended periods and dark backgrounds increase the visual weight of colored KPI accents. Light mode is available and persists across sessions via Zustand's `persist` middleware.
 
-**Typography:** Inter (display) + JetBrains Mono (monospace/metrics). Inter is the standard for data-dense dashboards — highly legible at small sizes. JetBrains Mono renders numbers with consistent character widths, ideal for metric values.
+### Typography
+**Inter** (display) + **JetBrains Mono** (monospace). Inter is highly legible at small sizes in data-dense layouts. JetBrains Mono uses consistent character widths for numeric glyphs — metric values don't cause layout shift when digits change.
 
 ---
 
 ## Technical Architecture
 
-### State Management
-Zustand handles all ephemeral global UI state — selected product, date range, and theme. The store uses the `persist` middleware so preferences survive page refreshes. Server state (API data) is intentionally kept out of Zustand and owned entirely by TanStack Query.
+### State Ownership
+Two distinct state layers with explicit boundaries:
+
+- **Zustand** — ephemeral UI state: selected product, date range, theme. Persisted to `localStorage` so user preferences survive refreshes. Server data is intentionally excluded.
+- **TanStack Query** — all server state: caching, deduplication, background sync. No API responses touch Zustand.
 
 ### Performance & API Strategy
 
-**TanStack Query** handles all server-state caching, deduplication, and background refetching:
-
-| Query | Cache Strategy | Reason |
+| Query | Strategy | Rationale |
 |---|---|---|
-| `server-state` | `refetchInterval: 60s` | Powers "Last Updated" — must stay fresh |
-| `products` | `staleTime: Infinity` | Product list never changes |
+| `server-state` | `refetchInterval: 60s` | Drives "Last Updated" badge — needs live data |
+| `products` | `staleTime: Infinity` | Static list — never refetch |
 | `stats` | `staleTime: 30s` | Near-real-time metrics |
-| `wins` | `staleTime: 30s`, infinite | Paginated — cached per page |
+| `wins` | `staleTime: 30s` + infinite pages | Cached per page — pagination without re-fetching |
 
-Query keys include all filter params `[section, product, start, end]` so the cache invalidates automatically when the user changes filters.
+Query keys include all filter params `[section, product, start, end]`. Changing any filter triggers automatic cache invalidation and refetch — no manual cache management needed.
 
-**Lazy Loading:** `QuickWins` is lazy-loaded via `React.lazy` + `Suspense`, deferring its bundle until the route renders.
+**Lazy Loading:** `QuickWins` is deferred via `React.lazy` + `Suspense`. The KPI section renders immediately while the heavier ad grid loads asynchronously.
 
-**Infinite scroll:** `useInfiniteQuery` combined with `react-intersection-observer`. When the sentinel element enters the viewport, the next page is fetched automatically. The `has_more` flag from the API controls when fetching stops.
+**Infinite Scroll:** `useInfiniteQuery` + `react-intersection-observer`. A sentinel element at the list bottom triggers `fetchNextPage()` when it enters the viewport. The `has_more` flag from the API controls termination — no client-side page counting.
 
-**Config loading:** `config.json` is loaded via a Promise singleton — all concurrent callers on mount share the same fetch, preventing the duplicate requests that occur with a simple null-check cache.
+**Config Singleton:** `config.json` is loaded via a Promise singleton rather than a value cache:
+
+```ts
+let configPromise: Promise<ApiConfig> | null = null;
+
+export function loadConfig(): Promise<ApiConfig> {
+  if (!configPromise) {
+    configPromise = fetch('/config.json').then(res => res.json());
+  }
+  return configPromise; // all callers share the same Promise
+}
+```
+
+A naive `null` check cache fires duplicate requests because all 6 parallel queries on mount read `null` before any fetch resolves. The Promise singleton ensures a single network request regardless of concurrency.
 
 ### Docker & API Routing
 
-The frontend Dockerfile uses a multi-stage build: Vite compiles the app in stage 1, nginx serves the static output in stage 2. nginx is configured to proxy `/api/*` requests to the backend container internally.
+Multi-stage Dockerfile: Vite compiles the app in the builder stage, nginx serves the static output in the runner stage. nginx proxies `/api/*` to the backend container on the internal Docker network.
 
-`config.json` specifies `baseUrl: "http://localhost:3000"` for local development. In Docker, `client.ts` detects that the configured host differs from the app host and automatically falls back to `window.location.origin`, routing all API calls through the nginx proxy.
+`config.json` ships with `baseUrl: "http://localhost:3000"`. In Docker, `client.ts` detects that the configured host differs from the app host and falls back to `window.location.origin`, routing all requests through nginx:
 
-This means **no changes to `config.json` are needed** between environments.
+```
+Local dev:  configured=localhost:3000, app=localhost:5173 → ports differ → use :5173 → Vite proxy
+Docker:     configured=localhost:3000, app=localhost:8080 → ports differ → use :8080 → nginx proxy
+```
+
+`config.json` requires no modification between environments.
 
 ---
 
 ## Deliberate Engineering Decisions
 
 ### API Slug Definition
-The `/api/stats/:section` endpoint slugs are not defined in the spec. I defined `active | launched | hooks | lifespan` as a TypeScript union type (`StatSection`) based on the four KPI names, creating a single typed source of truth in `KPI_CONFIG`. Any invalid slug value produces a TypeScript compile error rather than a silent runtime failure.
+`/api/stats/:section` slugs are undefined in the spec. I defined `active | launched | hooks | lifespan` as a TypeScript union type (`StatSection`) — a single typed source of truth in `KPI_CONFIG`. Invalid slugs produce compile-time errors rather than silent runtime failures.
 
-### Image Error Handling
-Image URLs returned by `/api/wins` occasionally fail to load — this is intentional per the spec. Each ad card implements a 3-state machine (`loading → loaded | error`):
+### Image State Machine (`AdCardImage`)
+Each ad card thumbnail is managed by a dedicated `AdCardImage` component implementing a 3-state machine:
 
-- **`loading`** — animated shimmer skeleton fills the image area
-- **`loaded`** — image fades in via opacity transition
-- **`error`** — the `<img>` element is fully unmounted from the DOM, preventing the browser's native broken image icon. A designed fallback with a landscape icon and campaign title renders instead.
+```
+loading → skeleton shimmer
+loaded  → image fades in (opacity transition)
+error   → <img> unmounted from DOM + designed fallback renders
+```
 
-A single retry is attempted before settling on the error state, since the backend randomizes URLs — a retry has a meaningful chance of succeeding.
+The `<img>` element is **fully unmounted** on error — not hidden with `opacity: 0`. A hidden element still exists in the DOM and triggers the browser's native broken image icon. Unmounting eliminates the element entirely.
 
-Cards with failed images are kept in their grid position. The image is a presentation asset — hiding the entire card would silently remove valid ad data from the user's view.
+#### Render Optimization
 
-**Note on browser limitations:** The browser's `onError` event does not expose HTTP status codes for image requests. We cannot distinguish a 404 from a network timeout — the retry is a best-effort attempt in both cases.
+Unstable props — function references recreated on every render — were identified via React DevTools Profiler as the source of unnecessary re-renders across the ad grid. Memoization was applied surgically to the confirmed bottleneck only, not preemptively. The guiding principle: **measure first, optimize with purpose** — memoization carries its own cost in dependency tracking and readability, and should only be introduced where profiling justifies it.
+
+One retry is attempted before settling on error. The backend randomizes URLs on each request — a retry has a meaningful chance of resolving to a valid image.
+
+**Browser limitation:** `onError` does not expose HTTP status codes for image requests. A 404 and a network timeout are indistinguishable — the retry is a best-effort attempt in both cases.
+
+Cards with failed images remain in grid position. The image is a presentation asset — removing the card would silently drop valid ad data from the user's view.
 
 ### Cache Buster Normalization
-The `/api/wins` endpoint appends `?t=Date.now()+Math.random()` to every image URL. This is a backend anti-pattern that defeats browser image caching, causing repeated network requests on every pagination load. `normalizeImageUrl()` in `endpoints.ts` strips the `t` parameter before the URL reaches the `<img>` tag, restoring standard browser caching behavior. This is documented here as a known backend issue that should be resolved at the source in a production environment.
+`/api/wins` appends `?t=Date.now()+Math.random()` to every image URL — a backend anti-pattern that defeats browser caching and causes redundant network requests on every pagination load. `normalizeImageUrl()` strips the `t` parameter before the URL reaches `<img src>`, restoring standard caching. This is flagged here as a known issue that should be fixed at the source in production.
 
 ### React Hooks Compliance
-KPI data fetching uses a dedicated `KPIItem` sub-component per metric rather than calling `useStats` inside a `.map()` loop. Calling hooks inside loops violates React's Rules of Hooks. Each `KPIItem` calls `useStats` at the top level of its own component — the correct pattern.
+Each KPI renders in its own `KPIItem` component so `useStats` is called unconditionally at the top level — never inside a `.map()` loop. Calling hooks inside loops violates React's Rules of Hooks and produces non-deterministic hook ordering. The pattern also allows TanStack Query to deduplicate the 4 parallel stat requests correctly.
 
 ### Image Component Separation
-Image state logic is extracted into a dedicated `AdCardImage` component, separate from `AdCard`. This follows the single responsibility principle — `AdCard` handles layout and data display, `AdCardImage` owns the loading state machine. The SVG fallback icon is further extracted as `ImageFallbackIcon` for clarity.
+Image state logic lives in `AdCardImage`, separate from `AdCard`. `AdCard` is responsible for layout and data rendering only. `AdCardImage` owns the full loading state machine. `ImageFallbackIcon` is extracted as a named sub-component for clarity and potential reuse. This follows the single responsibility principle at the component level.
 
 ---
 
@@ -153,24 +188,27 @@ Image state logic is extracted into a dedicated `AdCardImage` component, separat
 | Breakpoint | Layout |
 |---|---|
 | Desktop (>768px) | Fixed sidebar + scrollable main content |
-| Tablet (≤1100px) | KPI grid collapses from 4 to 2 columns |
-| Tablet nav (480–768px) | Bottom nav items stretch evenly — no empty space at row end |
-| Mobile (≤768px) | Sidebar replaced by fixed bottom nav with horizontal scroll |
-| Small phones (≤380px) | Ad grid collapses to single column |
+| Tablet (≤1100px) | KPI grid: 4 → 2 columns |
+| Tablet nav (480–768px) | Bottom nav items: `flex: 1` — fills full width, no trailing gap |
+| Mobile (≤768px) | Sidebar hidden, replaced by fixed bottom nav |
+| Small phones (≤380px) | Ad grid: 2 → 1 column |
 
-On mobile, `overflow: hidden` is removed from `.app-shell` — it clips `position: fixed` children (the mobile nav) on certain mobile browsers. The main content area handles its own scroll via `overflow-y: auto`. `100dvh` is used instead of `100vh` to account for the dynamic browser toolbar in mobile Safari and Chrome.
+Two non-obvious decisions:
+
+1. **`overflow: hidden` removed from `.app-shell`** — a containing block with `overflow: hidden` clips `position: fixed` descendants on certain mobile browsers, hiding the bottom nav entirely.
+2. **`100dvh` instead of `100vh`** — `100vh` on mobile Safari and Chrome does not account for the dynamic browser toolbar that appears and collapses on scroll. `100dvh` (dynamic viewport height) tracks the actual available height.
 
 ---
 
 ## Tech Stack
 
-| Concern | Library |
-|---|---|
-| Framework | React 19 + TypeScript |
-| Build | Vite 7 |
-| Server State | TanStack Query v5 |
-| Client State | Zustand v5 |
-| Infinite Scroll | react-intersection-observer |
-| Styling | Bootstrap 5 + SCSS modules |
-| Fonts | Inter + JetBrains Mono (Google Fonts) |
-| Containerization | Docker + nginx (multi-stage build) |
+| Concern | Library | Version |
+|---|---|---|
+| Framework | React + TypeScript | 19 |
+| Build | Vite | 7 |
+| Server State | TanStack Query | v5 |
+| Client State | Zustand | v5 |
+| Infinite Scroll | react-intersection-observer | v10 |
+| Styling | Bootstrap + SCSS | Bootstrap 5 |
+| Fonts | Inter + JetBrains Mono | Google Fonts |
+| Containerization | Docker + nginx | multi-stage build |

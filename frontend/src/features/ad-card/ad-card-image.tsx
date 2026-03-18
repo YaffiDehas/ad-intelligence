@@ -59,7 +59,9 @@ function ImageFallbackIcon() {
 export function AdCardImage({ src, alt }: AdCardImageProps) {
   const [status, setStatus] = useState<ImageStatus>('loading');
   const [retried, setRetried] = useState(false);
-
+// Memoized to stabilize the prop reference across renders.
+// Without this, every AdCardImage render creates a new function instance,
+// causing React to re-render all 50 cards in the grid unnecessarily.
   const handleError = useCallback(() => {
     if (!retried) {
       setRetried(true);
